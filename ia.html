@@ -1,38 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
-  <title>MARIAN API IA</title>
+  <title>NIC AI</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; }
-    label, input, textarea { display: block; margin: 1em 0; }
-    #respuesta { white-space: pre-wrap; background: #f0f0f0; padding: 1em; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url(Wallpaper.jpg);
+      color: #fff;
+    }
+
+    h1,
+    h3 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      justify-content: center;
+      gap: 0.5em;
+      padding: 1em;
+      background: #2c2c2c;
+      border-bottom: 2px solid #444;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.7em;
+      border: none;
+      border-radius: 5px;
+      font-size: 1em;
+    }
+
+    button {
+      padding: 0.7em 1.2em;
+      border: none;
+      background: #ff6b00;
+      color: white;
+      font-size: 1em;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #ff8533;
+    }
+
+    #respuesta {
+      max-width: 800px;
+      margin: 2em auto;
+      padding: 1em;
+      background: #2c2c2c;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+
+    p {
+      margin: 0.5em 0;
+    }
+
+    strong {
+      color: #ff6b00;
+    }
+
+    
   </style>
 </head>
+
 <body>
-  <h1>MARIAN API IA</h1>
-  <h3>Utilizando modelo:<strong>Gemini 1.5</strong> </h3>
+  <h1>NIC AI</h1>
+  <h3>Using Model:<strong>Gemini 1.5</strong> </h3>
   <form id="geminiForm">
-    <label for="promptBase">Prompt Base:</label>
-    <textarea id="promptBase" rows="2" cols="60">Prompt base</textarea>
-    
-    <label for="consulta">Consulta del usuario:</label>
+
+    <label for="consulta">User Entry</label>
     <input type="text" id="consulta" size="60" required>
-    
-    <button type="submit">Enviar consulta</button>
+
+    <button type="submit">Send Entry</button>
   </form>
-  
-  <h2>Respuesta:</h2>
+
+  <h2>Response from User</h2>
   <div id="respuesta"></div>
-  
+
   <script>
-    document.getElementById('geminiForm').addEventListener('submit', function(e) {
+    document.getElementById('geminiForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      
+
       var url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=AIzaSyDA-Oa3GFjeaDtf0UHoouPE7Py66g7SILM';
-      var promptBase = document.getElementById('promptBase').value;
+      var promptBase = "Only answer questions about music. Be creative and relaxed, but mainatin formality. Greet the user and be polite and energetic. Use language that young people would use. Be chiill and cool. Adress the user as user or as human (or something fun idk).";
       var searchQuery = document.getElementById('consulta').value;
-      
+
       var data = {
         contents: [
           {
@@ -44,31 +105,41 @@
           }
         ]
       };
-      
+
       var respuestaDiv = document.getElementById('respuesta');
       respuestaDiv.textContent = "Consultando...";
-      
+
       var xhr = new XMLHttpRequest();
       xhr.open('POST', url, true);
       xhr.setRequestHeader('Content-Type', 'application/json');
-      
-      xhr.onreadystatechange = function() {
+
+      xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           if (xhr.status === 200) {
             try {
               var res = JSON.parse(xhr.responseText);
-              respuestaDiv.textContent = JSON.stringify(res, null, 2);
+
+              // Acá extraigo SOLO la respuesta del bot, COPIAR EN CUADERNO
+              if (res.candidates && res.candidates.length > 0) {
+                var answer = res.candidates[0].content.parts[0].text;
+                respuestaDiv.textContent = answer;
+              } else {
+                respuestaDiv.textContent = "No response from model.";
+              }
+
             } catch (err) {
-              respuestaDiv.textContent = "Error al parsear respuesta: " + err;
+              respuestaDiv.textContent = "Error parsing response: " + err;
             }
           } else {
             respuestaDiv.textContent = "Error: " + xhr.status + "\n" + xhr.responseText;
           }
         }
       };
-      
+
+
       xhr.send(JSON.stringify(data));
     });
   </script>
 </body>
+
 </html>
